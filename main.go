@@ -12,7 +12,7 @@ import (
 func main() {
 	fx.New(
 		// fornece as dependencias
-		fx.Provide(database.ConnectPostgresDB, repository.CreateUserRepository, server.NewUserHandler, server.NewServer),
+		fx.Provide(database.ConnectPostgresDB, repository.CreateUserRepository, server.NewUserHandler, repository.NewBetRepository, server.NewBetHandler, server.NewServer),
 		// aqui, vamos invok
 		fx.Invoke(func(mux *http.ServeMux) {}),
 	).Run()

@@ -18,6 +18,7 @@ type ServerParams struct {
 	Lifecycle   fx.Lifecycle
 	DB          *pgxpool.Pool
 	UserHandler *UserHandler
+	BetHandler  *BetHandler
 }
 
 // funcao simples de health
@@ -33,6 +34,7 @@ func NewServer(p ServerParams) *http.ServeMux {
 	// vamos criar uma rota de health simples
 	mux.HandleFunc("/health", HandleHealth)
 	mux.HandleFunc("POST /users", p.UserHandler.CreateUser)
+	mux.HandleFunc("POST /bets", p.BetHandler.CreateBet)
 
 	// cria os parametros para o servidor - a porta e o server mux com as rotas registradas
 	// porem agora quem vai iniciar mesmo o servidor vai ser o UberFX

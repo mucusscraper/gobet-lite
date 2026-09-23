@@ -12,6 +12,6 @@ type User struct {
 
 // aqui vai servir para o usuario transferir os dados para o sistema como DTO
 type CreateUserRequest struct {
-	Username string
-	Password string
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
