@@ -15,8 +15,9 @@ type ServerParams struct {
 	// ou seja, caça as dependencias no container e preenche a struct automaticamente antes de chamar a funcao
 	// no caso o lifecycle é nativo do fx e o *pgxpool.Pool vai vir do ConnectPostgresDB
 	fx.In
-	Lifecycle fx.Lifecycle
-	DB        *pgxpool.Pool
+	Lifecycle   fx.Lifecycle
+	DB          *pgxpool.Pool
+	UserHandler *UserHandler
 }
 
 // funcao simples de health
@@ -31,6 +32,7 @@ func NewServer(p ServerParams) *http.ServeMux {
 
 	// vamos criar uma rota de health simples
 	mux.HandleFunc("/health", HandleHealth)
+	mux.HandleFunc("POST /users", p.UserHandler.CreateUser)
 
 	// cria os parametros para o servidor - a porta e o server mux com as rotas registradas
 	// porem agora quem vai iniciar mesmo o servidor vai ser o UberFX

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/mucusscraper/gobet-lite/internal/database"
+	"github.com/mucusscraper/gobet-lite/internal/repository"
 	"github.com/mucusscraper/gobet-lite/internal/server"
 	"go.uber.org/fx"
 )
@@ -11,7 +12,7 @@ import (
 func main() {
 	fx.New(
 		// fornece as dependencias
-		fx.Provide(database.ConnectPostgresDB, server.NewServer),
+		fx.Provide(database.ConnectPostgresDB, repository.CreateUserRepository, server.NewUserHandler, server.NewServer),
 		// aqui, vamos invok
 		fx.Invoke(func(mux *http.ServeMux) {}),
 	).Run()

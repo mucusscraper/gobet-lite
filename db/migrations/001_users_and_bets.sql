@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS account (
     user_id INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-    total numeric(12,2) NOT NULL DEFAULT 0.00,
+    total numeric(12,2) NOT NULL DEFAULT 100.00,
     blocked BOOLEAN DEFAULT true
 );
 
