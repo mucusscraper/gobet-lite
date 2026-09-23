@@ -1,0 +1,35 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: gobet-lite-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=gobet-lite-db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d gobet-lite-db"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+  
+  migrate:
+    image: gomicro/goose:latest
+    container_name: gobet-lite-migrations
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./db/migrations:/migrations
+    environment:
+      - GOOSE_DRIVER=postgres
+      - GOOSE_DBSTRING=postgres://postgres:postgres@postgres:5432/gobet-lite-db?sslmode=disable
+      - GOOSE_DIR=/migrations
+    command: ["goose", "up"]
+
+volumes:
+  pgdata:
