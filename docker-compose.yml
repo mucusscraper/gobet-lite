@@ -31,5 +31,17 @@ services:
       - GOOSE_DIR=/migrations
     command: ["goose", "up"]
 
+  worker:
+    build: .
+    container_name: gobet-lite-worker
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/gobet-lite-db?sslmode=disable
+    restart: no
+    ports:
+      - "8080:8080"
+
 volumes:
   pgdata:
