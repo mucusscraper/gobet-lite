@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/mucusscraper/gobet-lite/internal/websockethub"
 	"go.uber.org/fx"
 )
 
@@ -19,6 +20,7 @@ type ServerParams struct {
 	DB          *pgxpool.Pool
 	UserHandler *UserHandler
 	BetHandler  *BetHandler
+	WsHub       *websockethub.Hub
 }
 
 // funcao simples de health
@@ -35,6 +37,7 @@ func NewServer(p ServerParams) *http.ServeMux {
 	mux.HandleFunc("/health", HandleHealth)
 	mux.HandleFunc("POST /users", p.UserHandler.CreateUser)
 	mux.HandleFunc("POST /bets", p.BetHandler.CreateBet)
+	mux.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) { ServeWs(p.WsHub, w, r) })
 
 	// cria os parametros para o servidor - a porta e o server mux com as rotas registradas
 	// porem agora quem vai iniciar mesmo o servidor vai ser o UberFX

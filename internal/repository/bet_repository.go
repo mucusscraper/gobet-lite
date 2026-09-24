@@ -7,15 +7,18 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/mucusscraper/gobet-lite/internal/models"
+	"github.com/mucusscraper/gobet-lite/internal/websockethub"
 )
 
 type BetRepository struct {
-	db *pgxpool.Pool
+	db    *pgxpool.Pool
+	wsHub *websockethub.Hub
 }
 
-func NewBetRepository(db *pgxpool.Pool) *BetRepository {
+func NewBetRepository(db *pgxpool.Pool, ws *websockethub.Hub) *BetRepository {
 	return &BetRepository{
-		db: db,
+		db:    db,
+		wsHub: ws,
 	}
 }
 
@@ -74,6 +77,16 @@ func (r *BetRepository) CreateBet(ctx context.Context, betParams models.CreateBe
 	err = tx.Commit(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("erro ao commitar transação: %w", err)
+	}
+	if r.wsHub != nil {
+		r.wsHub.SendToUser(bet.UserID, map[string]interface{}{
+			"event":       "bet.result",
+			"bet_id":      bet.ID,
+			"input":       bet.Input,
+			"multiplier":  bet.Multiplier,
+			"result":      bet.Result,
+			"new_balance": newBalance,
+		})
 	}
 	return &bet, nil
 }
